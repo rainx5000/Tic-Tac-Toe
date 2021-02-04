@@ -181,7 +181,161 @@
 
 
 
+//when move is made, reverse the array of players which would change the current player
+
+//get our cell that we marked and put it on the board
+
+//when we click on the selected cell, we can grab the data cell and shove it into a function as an argument to use
+//to store into board
 
 
+   const player = (marker) => {
+        const getMarker = () => marker
+        let isWinner = false;
+
+        const makeWinner = () => gameBoard.current().isWinner = true;
+
+        const rowCount = [0,0,0]; //any num to hit to 3 declares a winner;
+        const colCount = [0,0,0]; // any num to hit 3 declares a winner;
+        const diagCount = [0,0,0]; //all three nums should be 1 declares winner
+        const reverseDiagCount = [0,0,0] //all three nums should be 1 declares winner
+
+        const markerCount = (row, col) => {
+            colCount[col]+= 1;
+            rowCount[row]+= 1;
+            console.log (`rowCount: ${rowCount} and colCount: ${colCount}`)
+            if (col == 1 && row == 1) {
+                diagCount[col] = 1;
+                reverseDiagCount[col] = 1;
+            } else if (col == 0 && row == 0) {
+                diagCount[col] = 1;
+            } else if (col == 2 && row == 2) {
+                diagCount[col] = 1;
+            } else if (col == 2 && row == 0) {
+                reverseDiagCount[row] = 1;
+            } else if (col == 0 && row == 2) {
+                reverseDiagCount[row] = 1;
+            } 
+            checkWinner();
+            //function that would check for winner
+        }
+
+        const checkWinner = () => {
+            
+            rowCount.forEach(row => {
+                row == '3' && makeWinner();
+            })
+            colCount.forEach(col => {
+                col == '3' && makeWinner();
+            })
+            _checkEqual(diagCount) && makeWinner();
+            _checkEqual(reverseDiagCount) && makeWinner();
+            console.log(isWinner)
+        }
+
+       const placeMarker = (cords) => {
+        gameBoard.board[cords[0]][cords[1]] = gameBoard.current().getMarker();
+        markerCount(cords[0], cords[1]);
+       }
+
+       const _checkEqual = (arr) => arr.every(num => num === 1) 
+
+
+
+
+       return {
+           getMarker,
+           isWinner,
+           makeWinner,
+           markerCount,
+           placeMarker,
+           rowCount,
+           colCount,
+           diagCount,
+           reverseDiagCount
+        }
+   } 
+
+   const gameBoard = (function() {
+       const players = [player('X'), player('O')];
+
+       const current = () => players[0];
+
+       const switchTurn = () => players.reverse();
+       const getWinner = () => gameBoard.current().isWinner;
+
+       
 
     
+
+       const board = {
+           0: ['','',''],
+           1: ['','',''],
+           2: ['','','']
+       }
+
+       
+
+       return {
+           players,
+           board,
+           current,
+           switchTurn,
+           getWinner
+       }
+
+   })()
+
+   const displayController = (function () {
+    const menuBtn = document.querySelector('.menu-submit-btn');
+    const menuForm = document.querySelector('.menu');
+    const player1Input = document.querySelector('#player1-input');
+    const player2Input = document.querySelector('#player2-input');
+    const cells = document.querySelectorAll('.cell');
+    const turnDisplay = document.querySelector('.turn-display');
+    const markers = document.querySelectorAll('.marker')
+
+
+    //player names from menu to display
+    menuForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+
+        document.querySelector('.player1-display').textContent = player1Input.value + ' ';
+        document.querySelector('.player2-display').textContent = player2Input.value + ' ';
+        
+        menuForm.classList.add('display-off')
+    })
+
+    cells.forEach(cell => {
+       cell.addEventListener('click', (e) => {
+           if (e.target.textContent.length === 0) {
+            e.target.textContent = gameBoard.current().getMarker();
+           } 
+           gameBoard.current().placeMarker(e.target.dataset.cell.split('-')); //cords of current cell moving into gameBoard
+           gameBoard.getWinner() && console.log(`GAMEOVER ${gameBoard.current().getMarker()} won`)
+           gameBoard.switchTurn();
+        
+        }) 
+    })
+
+    let counterRow = 0;
+    let counterCell = 0;
+
+    cells.forEach((cell, index) => {
+        cell.dataset.cell = `${counterRow}-${counterCell}`;
+        counterCell++
+
+        if (index == '2') {
+            counterCell = 0;
+            counterRow++
+        } else if (index == '5') {
+            counterCell = 0;
+            counterRow++
+        }
+    })
+    
+    
+    
+    
+   })()
+

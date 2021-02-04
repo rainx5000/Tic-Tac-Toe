@@ -148,3 +148,7 @@ body {
 .display-off {
     display: none;
 }
+
+.currentTurn {
+    color: green;
+}
