@@ -152,3 +152,7 @@ body {
 .currentTurn {
     color: green;
 }
+
+.stopClick {
+    pointer-events: none;
+}

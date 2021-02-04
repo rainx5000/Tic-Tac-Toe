@@ -7,7 +7,7 @@
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-<div class="game-container">
+<div class="game-container stopClick display-off">
     <div class="game-board-container">
         <div class="cell"></div>
         <div class="cell"></div>
@@ -20,12 +20,18 @@
         <div class="cell"></div>
     </div>
     <div class="game-info">
-        <h2 class="players"><span class="player1-display">Player 1 </span>
+        <h2 class="players">
             <span id="player1-marker" class="marker">X</span>
+            <span class="player1-display">- Player 1 </span>
         </h2>
-        <h2 class="players"><span class="player2-display">Player 2 </span>
+        <h2 class="players">
             <span id="player2-marker" class="marker">O</span>
+            <span class="player2-display">- Player 2 </span>
         </h2>
+        <div class="game-over display-off">
+            <button class="replay">Play Again</button>
+            <button class="new-game">New Game</button>
+        </div>
     </div>
 </div>
 <form class="menu">
@@ -41,6 +47,7 @@
     <button class="menu-submit-btn">Start Game</button>
     
 </form>
+
 
 
     <script src="script.js"></script>
