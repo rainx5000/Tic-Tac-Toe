@@ -5,9 +5,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>TTT</title>
     <link rel="stylesheet" href="styles.css">
+    <link rel="preconnect" href="https://fonts.gstatic.com">
+<link href="https://fonts.googleapis.com/css2?family=Lato:wght@400;700&family=Open+Sans:wght@400;600;700&display=swap" rel="stylesheet">
 </head>
 <body>
 <div class="game-container stopClick display-off">
+    <div class="result"></div>
     <div class="game-board-container">
         <div class="cell"></div>
         <div class="cell"></div>
@@ -20,14 +23,16 @@
         <div class="cell"></div>
     </div>
     <div class="game-info">
+        <div class="players-display-container">
         <h2 class="players">
             <span id="player1-marker" class="marker">X</span>
-            <span class="player1-display">- Player 1 </span>
+            <span class="player1-display">Player 1 </span>
         </h2>
         <h2 class="players">
             <span id="player2-marker" class="marker">O</span>
-            <span class="player2-display">- Player 2 </span>
+            <span class="player2-display">Player 2 </span>
         </h2>
+    </div>
         <div class="game-over display-off">
             <button class="replay">Play Again</button>
             <button class="new-game">New Game</button>
@@ -36,12 +41,12 @@
 </div>
 <form class="menu">
     <div class="player1-container">
-        <label for="player1-input">Player 1
-        <input type="text" id="player1-input" placeholder="Player1 Name"></label>
+        
+        <input type="text" id="player1-input" placeholder="Player1 Name" required>
     </div>
     <div class="player2-container">
-        <label for="player2-input" class="player2-label">Player 2
-        <input type="text" id="player2-input" placeholder="Player2 Name"></label>
+        
+        <input type="text" id="player2-input" placeholder="Player2 Name" required>
     </div>
 
     <button class="menu-submit-btn">Start Game</button>

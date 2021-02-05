@@ -10,7 +10,7 @@
         let diagCount = [0,0,0]; //all three nums should be 1 declares winner
         let reverseDiagCount = [0,0,0] //all three nums should be 1 declares winner
 
-        const resetStats = () => {
+        const resetStats = () => { //reset counters
             rowCount = [0,0,0]; 
             colCount = [0,0,0]; 
             diagCount = [0,0,0]; 
@@ -18,12 +18,12 @@
             isWinner = false;
         }
 
-        const placeMarker = (cords) => {
+        const placeMarker = (cords) => { //puts the mark on the board array
             gameBoard.board[cords[0]][cords[1]] = gameBoard.current().getMarker();
             markerCount(cords[0], cords[1]);
            }
 
-        const markerCount = (row, col) => {
+        const markerCount = (row, col) => { //tracks how many marks for each player are within a col/row/dia/revdiag
             colCount[col]+= 1;
             rowCount[row]+= 1;
             
@@ -39,8 +39,6 @@
             } else if (col == 0 && row == 2) {
                 reverseDiagCount[row] = 1;
             } 
-            console.log (`rowCount: ${rowCount} and colCount: ${colCount} diaCount: ${diagCount} revdiaG: ${reverseDiagCount}`)
-            // checkWinner();
         }
 
         const checkWinner = () => {    //will check scan the counter arrays
@@ -65,8 +63,7 @@
                 }
             }
 
-            tie && gameBoard.makeTie()
-            // console.log(tie)
+            tie && gameBoard.makeTie() //checks if board is tie, if it is, gameBoard tie variable will become true
         }
 
        const _checkEqual = (arr) => arr.every(num => num === 1) //used to check if all the elements are the same value of an array used in checkWinner()
@@ -92,7 +89,6 @@
        const players = [player('X'), player('O')];
 
        const current = () => players[0];
-    //    const lastPlayer = () => players[1];
        const switchTurn = () => players.reverse();
 
        const getWinner = () => gameBoard.current().isWinner;
@@ -114,11 +110,9 @@
 
         players.forEach(player => {
             player.resetStats();
-            console.log(player)
         }) 
         
     }
-
 
        return {
            players,
@@ -136,25 +130,28 @@
    })()
 
    const displayController = (function () {
-    const menuBtn = document.querySelector('.menu-submit-btn');
     const menuForm = document.querySelector('.menu');
     const player1Input = document.querySelector('#player1-input');
     const player2Input = document.querySelector('#player2-input');
     const cells = document.querySelectorAll('.cell');
-    const turnDisplay = document.querySelector('.turn-display');
     const markers = document.querySelectorAll('.marker');
     const restartGame = document.querySelector('.game-over');
+    const resultHeading = document.querySelector('.result');
+    const player1Display = document.querySelector('.player1-display');
+    const player2Display = document.querySelector('.player2-display');
+    const gameContainer = document.querySelector('.game-container');
 
 
     //player names from menu to display
     menuForm.addEventListener('submit', (e) => {
         e.preventDefault();
 
-        document.querySelector('.player1-display').textContent = '- ' + player1Input.value;
-        document.querySelector('.player2-display').textContent = '- ' + player2Input.value;
+        player1Display.textContent = player1Input.value;
+        player1Display.classList.add('bold');
+        player2Display.textContent = player2Input.value;
         
         menuForm.classList.add('display-off')
-        document.querySelector('.game-container').classList.remove('display-off', 'stopClick')
+        gameContainer.classList.remove('display-off', 'stopClick')
         
 
     })
@@ -163,13 +160,11 @@
        cell.addEventListener('click', (e) => {
            if (e.target.textContent.length === 0) { //lets you only click once on a spot
             e.target.textContent = gameBoard.current().getMarker();
+
             gameBoard.current().placeMarker(e.target.dataset.cell.split('-')); //cords of current cell moving into gameBoard
             gameBoard.current().checkWinner();
-            gameBoard.getWinner() 
-            console.log(gameBoard.getWinner())
-            gameBoard.current().isWinner == true && gameOver();
-            gameBoard.getTie() == true && gameOver();
-            gameBoard.switchTurn(); 
+            // gameBoard.getWinner() 
+            checkWinner();
            } 
         }) 
     })
@@ -178,8 +173,14 @@
     const gameOver = () => {
         const markersArr = Array.from(markers);
         const winnerDisplay = markersArr.filter(player => player.textContent == gameBoard.current().getMarker())
-        let winnerName = winnerDisplay[0].nextElementSibling.textContent;
-        gameBoard.current().isWinner && (winnerDisplay[0].nextElementSibling.textContent = winnerName + ' wins!')
+        let winnerName = winnerDisplay[0].nextElementSibling;
+
+        if (gameBoard.current().isWinner) {
+            resultHeading.textContent = `${winnerName.textContent} has won -`
+            winnerDisplay[0].nextElementSibling.textContent = winnerName.textContent + ' wins!'
+        } else if (gameBoard.getTie()) {
+            resultHeading.textContent = 'Tie Game'
+        }
 
         gameBoard.current().resetWinner();
         gameBoard.resetTie();
@@ -193,26 +194,36 @@
         gameBoard.resetBoard()
         restartGame.classList.add('display-off');
         cells.forEach(cell => cell.classList.remove('stopClick')) //stops the user from clicking any more
+
+        player1Display.classList.toggle('bold');
+        player2Display.classList.toggle('bold');
+        gameBoard.switchTurn()
     })
         
     document.querySelector('.new-game').addEventListener('click', (e) => {
         player1Input.value = '';
         player2Input.value = '';
+        resultHeading.textContent = ''
         cells.forEach(cell => {cell.textContent = ''})
         gameBoard.resetBoard()
         restartGame.classList.add('display-off');
         menuForm.classList.remove('display-off');
         cells.forEach(cell => cell.classList.remove('stopClick')) //stops the user from clicking any more
+        player1Display.classList.remove('bold');
+        player2Display.classList.remove('bold');
+        gameContainer.classList.add('display-off')
+        gameBoard.current().getMarker() != 'X' && switchTurn()
     })
     const DOMReset = () => {
+        resultHeading.textContent = ''
         cells.forEach(cell => {cell.textContent = ''})
-        document.querySelector('.player1-display').textContent = '- ' + player1Input.value;
-        document.querySelector('.player2-display').textContent = '- ' + player2Input.value;
+        player1Display.textContent = player1Input.value;
+        player2Display.textContent = player2Input.value;
     }
 
 
 
-    //setting unique values of each cell based on position
+    //setting cords of each cell
     let counterRow = 0;
     let counterCell = 0;
     cells.forEach((cell, index) => {
@@ -227,15 +238,21 @@
             counterRow++
         }
     })
+
+    function checkWinner () {
+        if (gameBoard.current().isWinner || gameBoard.getTie()) {
+            return gameOver();
+        } else {
+            player1Display.classList.toggle('bold');
+            player2Display.classList.toggle('bold');
+            gameBoard.switchTurn();
+        }
+    }
    })()
 
 
 
-//when its a tie - stop the game
-//ask if they want to play again or go back to menu
 
-//when all the cells are filled with a marker - its a tie 
 
-//make it show visually who's turn it is
 
-//make names required for form
+
