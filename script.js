@@ -62,12 +62,11 @@
                     break;
                 }
             }
-
+            
             tie && gameBoard.makeTie() //checks if board is tie, if it is, gameBoard tie variable will become true
         }
 
        const _checkEqual = (arr) => arr.every(num => num === 1) //used to check if all the elements are the same value of an array used in checkWinner()
-       
        
        return {
            getMarker,
@@ -107,13 +106,10 @@
         for (let row in board) {
          board[row] = ['','','']
         }   
-
         players.forEach(player => {
             player.resetStats();
-        }) 
-        
+        })  
     }
-
        return {
            players,
            board,
@@ -129,125 +125,126 @@
 
    })()
 
-   const displayController = (function () {
-    const menuForm = document.querySelector('.menu');
-    const player1Input = document.querySelector('#player1-input');
-    const player2Input = document.querySelector('#player2-input');
-    const cells = document.querySelectorAll('.cell');
-    const markers = document.querySelectorAll('.marker');
-    const restartGame = document.querySelector('.game-over');
-    const resultHeading = document.querySelector('.result');
-    const player1Display = document.querySelector('.player1-display');
-    const player2Display = document.querySelector('.player2-display');
-    const gameContainer = document.querySelector('.game-container');
+    const displayController = (function () {
+        const menuForm = document.querySelector('.menu');
+        const player1Input = document.querySelector('#player1-input');
+        const player2Input = document.querySelector('#player2-input');
+        const cells = document.querySelectorAll('.cell');
+        const markers = document.querySelectorAll('.marker');
+        const restartGame = document.querySelector('.game-over');
+        const resultHeading = document.querySelector('.result');
+        const player1Display = document.querySelector('.player1-display');
+        const player2Display = document.querySelector('.player2-display');
+        const gameContainer = document.querySelector('.game-container');
+        const replayBtn = document.querySelector('.replay');
+        const newGameBtn = document.querySelector('.new-game');
 
-
-    //player names from menu to display
-    menuForm.addEventListener('submit', (e) => {
-        e.preventDefault();
-
-        player1Display.textContent = player1Input.value;
-        player1Display.classList.add('bold');
-        player2Display.textContent = player2Input.value;
-        
-        menuForm.classList.add('display-off')
-        gameContainer.classList.remove('display-off', 'stopClick')
-        
-
-    })
-
-    cells.forEach(cell => {
-       cell.addEventListener('click', (e) => {
-           if (e.target.textContent.length === 0) { //lets you only click once on a spot
-            e.target.textContent = gameBoard.current().getMarker();
-
-            gameBoard.current().placeMarker(e.target.dataset.cell.split('-')); //cords of current cell moving into gameBoard
-            gameBoard.current().checkWinner();
-            // gameBoard.getWinner() 
-            checkWinner();
-           } 
-        }) 
-    })
-
-
-    const gameOver = () => {
         const markersArr = Array.from(markers);
         const winnerDisplay = markersArr.filter(player => player.textContent == gameBoard.current().getMarker())
-        let winnerName = winnerDisplay[0].nextElementSibling;
+        const loserDisplay = markersArr.filter(player => player.textContent != gameBoard.current().getMarker())
 
-        if (gameBoard.current().isWinner) {
-            resultHeading.textContent = `${winnerName.textContent} has won -`
-            winnerDisplay[0].nextElementSibling.textContent = winnerName.textContent + ' wins!'
-        } else if (gameBoard.getTie()) {
-            resultHeading.textContent = 'Tie Game'
+        //player names from menu to display
+        menuForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            playerNameReset()
+            menuForm.classList.add('display-off')
+            gameContainer.classList.remove('display-off', 'stopClick')
+            winnerDisplay[0].parentElement.lastElementChild.classList.add('bold'); //bolds the current player
+        })
+
+        cells.forEach(cell => {
+            cell.addEventListener('click', (e) => {
+                if (e.target.textContent.length === 0) { //lets you only click once on a spot
+                    e.target.textContent = gameBoard.current().getMarker();
+                    gameBoard.current().placeMarker(e.target.dataset.cell.split('-')); //cords of current cell moving into gameBoard
+                    gameBoard.current().checkWinner();
+                    checkWinner();
+                } 
+            }) 
+        })
+
+        const gameOver = () => {
+            if (gameBoard.current().isWinner) {
+                resultHeading.textContent = `${gameBoard.current().getMarker()} has won`
+            } else if (gameBoard.getTie()) {
+                resultHeading.textContent = 'Tie Game'
+            }
+            gameBoard.current().resetWinner();
+            gameBoard.resetTie();
+
+            restartGame.classList.remove('display-off');
+            cells.forEach(cell => cell.classList.add('stopClick')) //stops the user from clicking any more
         }
 
-        gameBoard.current().resetWinner();
-        gameBoard.resetTie();
+        replayBtn.addEventListener('click', (e) => {
+            gameReset();
+            playerNameReset()
+            bold()
+            resultHeading.textContent = '';
+            gameBoard.switchTurn()
+        })
+            
+        newGameBtn.addEventListener('click', (e) => {
+            DOMReset();
+            gameReset();
+            
+            player1Display.classList.remove('bold');
+            player2Display.classList.remove('bold');
+            menuForm.classList.remove('display-off');
+            gameContainer.classList.add('display-off');
+            gameBoard.current().getMarker() != 'X' && gameBoard.switchTurn()
+        })
 
-        restartGame.classList.remove('display-off');
-        cells.forEach(cell => cell.classList.add('stopClick')) //stops the user from clicking any more
-    }
+        const DOMReset = () => {
+            player1Input.value = '';
+            player2Input.value = '';
+            resultHeading.textContent = '';
+            cells.forEach(cell => {cell.textContent = ''});
 
-    document.querySelector('.replay').addEventListener('click', (e) => {
-        DOMReset()
-        gameBoard.resetBoard()
-        restartGame.classList.add('display-off');
-        cells.forEach(cell => cell.classList.remove('stopClick')) //stops the user from clicking any more
-
-        player1Display.classList.toggle('bold');
-        player2Display.classList.toggle('bold');
-        gameBoard.switchTurn()
-    })
-        
-    document.querySelector('.new-game').addEventListener('click', (e) => {
-        player1Input.value = '';
-        player2Input.value = '';
-        resultHeading.textContent = ''
-        cells.forEach(cell => {cell.textContent = ''})
-        gameBoard.resetBoard()
-        restartGame.classList.add('display-off');
-        menuForm.classList.remove('display-off');
-        cells.forEach(cell => cell.classList.remove('stopClick')) //stops the user from clicking any more
-        player1Display.classList.remove('bold');
-        player2Display.classList.remove('bold');
-        gameContainer.classList.add('display-off')
-        gameBoard.current().getMarker() != 'X' && switchTurn()
-    })
-    const DOMReset = () => {
-        resultHeading.textContent = ''
-        cells.forEach(cell => {cell.textContent = ''})
-        player1Display.textContent = player1Input.value;
-        player2Display.textContent = player2Input.value;
-    }
-
-
-
-    //setting cords of each cell
-    let counterRow = 0;
-    let counterCell = 0;
-    cells.forEach((cell, index) => {
-        cell.dataset.cell = `${counterRow}-${counterCell}`;
-        counterCell++
-
-        if (index == '2') {
-            counterCell = 0;
-            counterRow++
-        } else if (index == '5') {
-            counterCell = 0;
-            counterRow++
+            
+            cells.forEach(cell => cell.classList.remove('stopClick'));
         }
-    })
+        const gameReset = () => {
+            gameBoard.resetBoard();
+            cells.forEach(cell => {cell.textContent = ''});
 
-    function checkWinner () {
-        if (gameBoard.current().isWinner || gameBoard.getTie()) {
-            return gameOver();
-        } else {
-            player1Display.classList.toggle('bold');
-            player2Display.classList.toggle('bold');
-            gameBoard.switchTurn();
+            restartGame.classList.add('display-off');
+            cells.forEach(cell => cell.classList.remove('stopClick'));
         }
-    }
+
+        //setting cords of each cell
+        let counterRow = 0;
+        let counterCell = 0;
+        cells.forEach((cell, index) => {
+            cell.dataset.cell = `${counterRow}-${counterCell}`;
+            counterCell++
+
+            if (index == '2') {
+                counterCell = 0;
+                counterRow++
+            } else if (index == '5') {
+                counterCell = 0;
+                counterRow++
+            }
+        })
+
+        function checkWinner () { //checks for a winner or a tie
+            if (gameBoard.current().isWinner || gameBoard.getTie()) {
+                return gameOver();
+            } else {
+                gameBoard.switchTurn();
+            }
+            bold();
+        }
+
+        function playerNameReset () {
+            player1Display.textContent = player1Input.value;
+            player2Display.textContent = player2Input.value;
+        }
+        function bold() {
+            winnerDisplay[0].parentElement.lastElementChild.classList.toggle('bold'); 
+            loserDisplay[0].parentElement.lastElementChild.classList.toggle('bold'); 
+        }
    })()
 
 
@@ -256,3 +253,4 @@
 
 
 
+//if its a tie game dont apply the bold class- if there is a winner, apply it to the winner only
